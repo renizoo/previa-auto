@@ -1,0 +1,64 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+dist/
+dist-*/
+build/
+*.exe
+*.spec
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Data files
+downloads/
+*.csv
+*.json
+!package.json
+!package-lock.json
+!tsconfig.json
+
+# OS files
+.DS_Store
+Thumbs.db
+nul
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+*.egg-info/
+.pytest_cache/
+
+# Electron
+out/
+.webpack/
+
+# Logs
+logs/
+*.log
+
+# Storage state files
+storageState-*.json
+
+# Temporary files
+*.tmp
+*.temp

@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Atribuição de Entregas</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      padding: 40px;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 28px;
+      text-align: center;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 40px;
+      font-size: 14px;
+    }
+
+    .card {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 20px;
+      border: 2px solid #e9ecef;
+    }
+
+    .card-title {
+      font-size: 18px;
+      color: #333;
+      margin-bottom: 15px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon {
+      font-size: 20px;
+    }
+
+    .file-selector {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .file-input {
+      flex: 1;
+      padding: 12px;
+      border: 2px solid #dee2e6;
+      border-radius: 8px;
+      font-size: 14px;
+      background: white;
+      color: #333;
+    }
+
+    .file-input::placeholder {
+      color: #adb5bd;
+    }
+
+    button {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #5a6268;
+      transform: translateY(-2px);
+    }
+
+    .btn-success {
+      background: #28a745;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #218838;
+      transform: translateY(-2px);
+    }
+
+    button:disabled {
+      background: #e9ecef;
+      color: #adb5bd;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-run {
+      width: 100%;
+      padding: 16px;
+      font-size: 16px;
+      margin-top: 10px;
+    }
+
+    .info-box {
+      background: #e7f3ff;
+      border-left: 4px solid #2196F3;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+      font-size: 13px;
+      color: #0c5490;
+    }
+
+    .info-box strong {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .output-box {
+      background: #f8f9fa;
+      border: 2px solid #dee2e6;
+      border-radius: 8px;
+      padding: 15px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      max-height: 200px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      color: #333;
+      display: none;
+    }
+
+    .output-box.visible {
+      display: block;
+    }
+
+    .output-box.error {
+      background: #fff5f5;
+      border-color: #fc8181;
+      color: #c53030;
+    }
+
+    .output-box.success {
+      background: #f0fff4;
+      border-color: #9ae6b4;
+      color: #22543d;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .loading.visible {
+      display: block;
+    }
+
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 10px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .success-message {
+      display: none;
+      background: #d4edda;
+      border: 2px solid #c3e6cb;
+      color: #155724;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .success-message.visible {
+      display: block;
+    }
+
+    .success-message h3 {
+      margin-bottom: 15px;
+      color: #155724;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 15px;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #e9ecef;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 12px 24px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #6c757d;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s ease;
+    }
+
+    .tab-btn:hover {
+      color: #667eea;
+    }
+
+    .tab-btn.active {
+      color: #667eea;
+      border-bottom-color: #667eea;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Motoboys List */
+    .motoboys-list {
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .motoboy-item {
+      background: white;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s ease;
+    }
+
+    .motoboy-item:hover {
+      border-color: #667eea;
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+    }
+
+    .motoboy-info {
+      flex: 1;
+    }
+
+    .motoboy-name {
+      font-weight: 600;
+      font-size: 15px;
+      color: #333;
+      margin-bottom: 5px;
+    }
+
+    .motoboy-details {
+      font-size: 13px;
+      color: #666;
+    }
+
+    .motoboy-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-icon {
+      padding: 8px 12px;
+      font-size: 13px;
+      min-width: auto;
+    }
+
+    .btn-danger {
+      background: #dc3545;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #c82333;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal.visible {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-header {
+      padding: 20px;
+      border-bottom: 2px solid #e9ecef;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      font-size: 20px;
+      color: #333;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 28px;
+      color: #adb5bd;
+      cursor: pointer;
+      padding: 0;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-close:hover {
+      color: #333;
+    }
+
+    .modal-body {
+      padding: 20px;
+    }
+
+    .modal-footer {
+      padding: 20px;
+      border-top: 2px solid #e9ecef;
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #dee2e6;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: border-color 0.3s ease;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🏍️ Sistema de Atribuição de Entregas</h1>
+    <p class="subtitle">Atribua entregas automaticamente para motoboys</p>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="automation">🚀 Automação</button>
+      <button class="tab-btn" data-tab="motoboys">👥 Gerenciar Motoboys</button>
+      <button class="tab-btn" data-tab="scanner">📱 Scanner QR</button>
+    </div>
+
+    <!-- TAB: Automação -->
+    <div id="tab-automation" class="tab-content active">
+      <div class="info-box">
+        <strong>📋 Instruções:</strong>
+        1. Clique em "Iniciar Automação Completa"<br>
+        2. O sistema vai baixar automaticamente o arquivo de entregas<br>
+        3. Em seguida, processará e atribuirá os motoboys<br>
+        4. Aguarde a conclusão e abra o arquivo gerado
+      </div>
+
+    <div class="card">
+      <div class="card-title">
+        <span class="icon">🤖</span>
+        Automação Completa
+      </div>
+      <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+        Esta automação irá:<br>
+        • Fazer login no sistema<br>
+        • Baixar o relatório de entregas (Paraná)<br>
+        • Processar e atribuir motoboys<br>
+        • Gerar planilha final com resumo
+      </p>
+      <button id="runBtn" class="btn-primary btn-run">
+        🚀 Iniciar Automação Completa
+      </button>
+    </div>
+
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p>Processando entregas... Por favor, aguarde.</p>
+    </div>
+
+    <div class="output-box" id="output"></div>
+
+    <div class="success-message" id="successMessage">
+      <h3>✅ Processamento concluído com sucesso!</h3>
+      <p>Arquivo gerado na pasta <strong>Documentos/entregas/</strong></p>
+      <p id="outputPathText" style="font-size: 12px; margin-top: 10px; color: #155724; font-weight: 600;"></p>
+      <div class="actions">
+        <button id="openFileBtn" class="btn-success">
+          📄 Abrir Arquivo
+        </button>
+        <button id="newProcessBtn" class="btn-primary">
+          🔄 Novo Processamento
+        </button>
+      </div>
+    </div>
+    </div>
+
+    <!-- TAB: Gerenciar Motoboys -->
+    <div id="tab-motoboys" class="tab-content">
+      <div class="info-box">
+        <strong>👥 Gerenciamento de Motoboys:</strong>
+        Adicione, edite ou remova motoboys e suas áreas de atendimento.
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span class="icon">📋</span>
+          Lista de Motoboys
+          <button id="addMotoboyBtn" class="btn-primary" style="margin-left: auto; padding: 8px 16px; font-size: 13px;">
+            ➕ Adicionar Motoboy
+          </button>
+        </div>
+
+        <div id="motoboysList" class="motoboys-list">
+          <div class="loading visible">
+            <div class="spinner"></div>
+            <p>Carregando motoboys...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: Scanner QR -->
+    <div id="tab-scanner" class="tab-content">
+      <div class="info-box">
+        <strong>📱 Scanner de QR Code:</strong>
+        Bipe ou digite o código da entrega para ver qual motoboy está responsável.<br>
+        <br>
+        <strong>Como funciona:</strong><br>
+        • <strong>JSON</strong> ({"id":"45769573494",...}) → extrai campo <strong>id</strong> e busca em CODIGO1<br>
+        • Códigos começando com <strong>BR</strong> → busca em CODIGO2 (etiqueta)<br>
+        • Outros códigos → busca em CODIGO1 (pacote)
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span class="icon">🔍</span>
+          Buscar Entrega
+        </div>
+
+        <div class="form-group">
+          <label>Código da Entrega (Pacote, Etiqueta ou JSON)</label>
+          <input
+            type="text"
+            id="scannerInput"
+            class="form-control"
+            placeholder="Bipe o QR Code ou digite o código..."
+            autocomplete="off"
+            style="font-size: 18px; padding: 15px; text-align: center;"
+          >
+          <small style="color: #666; font-size: 12px; margin-top: 5px; display: block;">
+            💡 Aceita JSON {"id":"..."}, códigos BR ou códigos diretos
+          </small>
+        </div>
+
+        <button id="searchBtn" class="btn-primary btn-run">
+          🔍 Buscar
+        </button>
+
+        <button id="clearScannerBtn" class="btn-secondary" style="width: 100%; margin-top: 10px; padding: 12px;">
+          🔄 Limpar e Buscar Novamente
+        </button>
+      </div>
+
+      <!-- Resultado da busca -->
+      <div id="scannerResult" style="display: none; margin-top: 30px;">
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; padding: 50px; text-align: center; color: white; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);">
+          <div style="font-size: 24px; margin-bottom: 20px; opacity: 0.9;">
+            📦 Entrega encontrada!
+          </div>
+          <div style="font-size: 18px; margin-bottom: 10px; opacity: 0.8;">
+            Motoboy responsável:
+          </div>
+          <div id="motoboyName" style="font-size: 72px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);">
+            -
+          </div>
+          <div id="deliveryDetails" style="font-size: 16px; margin-top: 30px; opacity: 0.9;">
+            -
+          </div>
+        </div>
+      </div>
+
+      <!-- Mensagem de não encontrado -->
+      <div id="scannerNotFound" style="display: none; margin-top: 30px;">
+        <div style="background: #fff3cd; border: 2px solid #ffc107; border-radius: 12px; padding: 30px; text-align: center;">
+          <div style="font-size: 48px; margin-bottom: 15px;">⚠️</div>
+          <div style="font-size: 20px; font-weight: 600; color: #856404; margin-bottom: 10px;">
+            Código não encontrado
+          </div>
+          <div style="font-size: 14px; color: #856404;">
+            O código <strong id="searchedCode"></strong> não foi encontrado na planilha de entregas.
+          </div>
+        </div>
+      </div>
+
+      <!-- Mensagem de erro -->
+      <div id="scannerError" style="display: none; margin-top: 30px;">
+        <div style="background: #f8d7da; border: 2px solid #dc3545; border-radius: 12px; padding: 30px; text-align: center;">
+          <div style="font-size: 48px; margin-bottom: 15px;">❌</div>
+          <div style="font-size: 18px; font-weight: 600; color: #721c24; margin-bottom: 10px;">
+            Erro ao buscar entrega
+          </div>
+          <div id="scannerErrorMessage" style="font-size: 14px; color: #721c24;">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para adicionar/editar motoboy -->
+  <div id="motoboyModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">Adicionar Motoboy</h2>
+        <button class="modal-close" id="closeModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Nome do Motoboy</label>
+          <input type="text" id="motoboyNome" class="form-control" placeholder="Ex: João Silva">
+        </div>
+        <div class="form-group">
+          <label>Cidade</label>
+          <input type="text" id="motoboyCidade" class="form-control" placeholder="Ex: Curitiba">
+        </div>
+        <div class="form-group">
+          <label>Bairro</label>
+          <input type="text" id="motoboyBairro" class="form-control" placeholder="Ex: Centro (deixe vazio para atender toda cidade)">
+        </div>
+        <div class="form-group">
+          <label>CEP (primeiros 5 dígitos)</label>
+          <input type="text" id="motoboyCep" class="form-control" placeholder="Ex: 80020 (deixe vazio se não específico)" maxlength="5">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="cancelModal" class="btn-secondary">Cancelar</button>
+        <button id="saveMotoboyBtn" class="btn-primary">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

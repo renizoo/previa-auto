@@ -1,0 +1,80 @@
+{
+  "name": "sistema-entregas-motoboys",
+  "productName": "Sistema de Entregas - Motoboys",
+  "version": "1.0.0",
+  "description": "Sistema de atribuição automática de entregas para motoboys",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "devc": "tsx script-logmanager.ts",
+    "run:logmanager": "node --env-file=.env --loader tsx script-logmanager.ts",
+    "compile:ts": "tsc",
+    "prebuild": "npm run compile:ts",
+    "build": "electron-builder --mac --dir",
+    "predist": "npm run compile:ts",
+    "dist": "electron-builder --mac",
+    "predist:all": "npm run compile:ts",
+    "dist:all": "electron-builder -mwl",
+    "predist:win": "npm run compile:ts",
+    "dist:win": "electron-builder --win --x64"
+  },
+  "keywords": ["entregas", "motoboys", "automacao", "logistica"],
+  "author": "Renan Antunes <rmaciel42@gmail.com>",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "dotenv": "^17.2.2",
+    "playwright": "^1.55.0",
+    "tsx": "^4.20.5",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "build": {
+    "appId": "com.sistema.entregas.motoboys",
+    "productName": "Sistema de Entregas",
+    "asar": false,
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer.js",
+      "index.html",
+      "script-logmanager.ts",
+      "dist-scripts/**/*",
+      "previa.py",
+      ".env",
+      "storageState-logmanager.json",
+      "node_modules/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "motoboys.csv",
+        "to": "motoboys.csv"
+      },
+      {
+        "from": ".env",
+        "to": ".env"
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "target": ["dmg", "zip"],
+      "icon": "build/icon.icns"
+    },
+    "win": {
+      "target": ["portable"],
+      "icon": "build/icon.ico",
+      "signingHashAlgorithms": ["sha256"],
+      "signAndEditExecutable": false
+    },
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "category": "Utility"
+    }
+  }
+}
